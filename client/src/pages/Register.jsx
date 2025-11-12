@@ -7,11 +7,12 @@ import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const schema = yup.object().shape({
+    name: yup.string().required('Name is required').min(3, 'Name must be at least 3 characters'),
     email: yup.string().required('Email is required').email('Enter a valid email'),
     password: yup.string().required('Password is required').min(6, 'Password must be at least 6 characters'),
 });
 
-const Login = () => {
+const Register = () => {
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
@@ -19,13 +20,11 @@ const Login = () => {
 
     const onSubmit = async data => {
         try {
-            const res = await api.post('/login', data);
-            localStorage.setItem('token', res.data.token);
-            localStorage.setItem('user', JSON.stringify(res.data.user));
-            Swal.fire('Success', res.data.message || 'Logged in successfully', 'success');
-            setTimeout(() => navigate('/'), 1000);
+            const res = await api.post('/register', data);
+            Swal.fire('Success', res.data.message || 'Registered successfully', 'success');
+            setTimeout(() => navigate('/login'), 1500);
         } catch (err) {
-            Swal.fire('Error', err.response?.data?.message || 'Login failed', 'error');
+            Swal.fire('Error', err.response?.data?.message || 'Registration failed', 'error');
         }
     };
 
@@ -33,8 +32,15 @@ const Login = () => {
         <div className="container mt-5">
             <div className="card mx-auto" style={{ maxWidth: '400px' }}>
                 <div className="card-body">
-                    <h3 className="card-title mb-4 text-center">Login</h3>
+                    <h3 className="card-title mb-4 text-center">Register</h3>
                     <form onSubmit={handleSubmit(onSubmit)}>
+                        <input
+                            {...register('name')}
+                            placeholder="Name"
+                            className={`form-control mb-2 ${errors.name ? 'is-invalid' : ''}`}
+                        />
+                        <div className="invalid-feedback">{errors.name?.message}</div>
+
                         <input
                             {...register('email')}
                             placeholder="Email"
@@ -50,10 +56,10 @@ const Login = () => {
                         />
                         <div className="invalid-feedback">{errors.password?.message}</div>
 
-                        <button className="btn btn-primary w-100 mt-2" type="submit">Login</button>
+                        <button className="btn btn-primary w-100 mt-2" type="submit">Register</button>
                     </form>
                     <p className="mt-3 text-center">
-                        Don't have an account? <a href="/register">Register</a>
+                        Already have an account? <a href="/login">Login</a>
                     </p>
                 </div>
             </div>
@@ -61,4 +67,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Register;

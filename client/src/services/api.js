@@ -1,7 +1,10 @@
 import axios from 'axios';
 
-const API = axios.create({
-    baseURL: 'http://localhost:8000/api',
+const api = axios.create({
+    baseURL: 'http://localhost:8000/api/auth', // your backend auth routes base URL
+    headers: {
+        'Content-Type': 'application/json',
+    },
 });
 
-export default API;
+export default api;
