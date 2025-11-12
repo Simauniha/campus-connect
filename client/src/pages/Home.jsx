@@ -1,21 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import API from '../services/api';
+import React from 'react';
 
 const Home = () => {
-  const [message, setMessage] = useState('');
+    const user = JSON.parse(localStorage.getItem('user'));
 
-  useEffect(() => {
-    API.get('/')
-      .then(res => setMessage(res.data))
-      .catch(err => console.log(err));
-  }, []);
-
-  return (
-    <div className="container mt-5">
-      <h1>Campus Connect Home</h1>
-      <p>{message}</p>
-    </div>
-  );
+    return (
+        <div>
+            <h2>Welcome {user?.name || 'Guest'}!</h2>
+            <p>This is the Campus Connect Home page.</p>
+            <p>Click on "Posts" in the navbar to see the feed.</p>
+        </div>
+    );
 };
 
 export default Home;
