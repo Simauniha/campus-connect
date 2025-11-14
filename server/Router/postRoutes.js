@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const postController = require('../Controllers/postController');
+const { createPost, getAllPosts } = require('../Controllers/postController');
+const authMiddleware = require('../Middleware/authMiddleware');
 
-// Create a post
-router.post('/create', postController.createPost);
+// Public route to get all posts
+router.get('/', getAllPosts);
 
-// Get all posts
-router.get('/', postController.getPosts);
+// Protected route to create a post
+router.post('/', authMiddleware, createPost);
 
 module.exports = router;

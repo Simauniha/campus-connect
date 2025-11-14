@@ -5,24 +5,27 @@ const Navbar = () => {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
 
-    // Update login state on localStorage change
     useEffect(() => {
-        const handleStorageChange = () => setIsLoggedIn(!!localStorage.getItem('token'));
-        window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
+        const updateLoginState = () => {
+            setIsLoggedIn(!!localStorage.getItem('token'));
+        };
+
+        window.addEventListener('authChanged', updateLoginState);
+        return () => window.removeEventListener('authChanged', updateLoginState);
     }, []);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        setIsLoggedIn(false);
+        window.dispatchEvent(new Event('authChanged'));
         navigate('/login');
     };
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-light bg-light mb-3">
+        <nav className="navbar navbar-expand-lg custom-navbar mb-3">
             <div className="container">
                 <Link to="/" className="navbar-brand">Campus Connect</Link>
+                
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span className="navbar-toggler-icon"></span>
                 </button>
@@ -32,6 +35,7 @@ const Navbar = () => {
                         <li className="nav-item">
                             <Link to="/" className="nav-link">Home</Link>
                         </li>
+
                         {isLoggedIn ? (
                             <>
                                 <li className="nav-item">

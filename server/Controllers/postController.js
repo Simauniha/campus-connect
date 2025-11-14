@@ -1,27 +1,33 @@
-const Post = require('../Models/Post');
+const Post = require('../Models/PostModel');
 
-// Create a new post
+// Create a post
 exports.createPost = async (req, res) => {
     try {
-        const { content } = req.body;
-        if (!content) return res.status(400).json({ message: "Content is required" });
+        const { title, content } = req.body;
+        const post = await Post.create({
+            title,
+            content,
+            author: req.user.id, // comes from auth middleware
+        });
 
-        const newPost = await Post.create({ user: req.body.userId, content });
-        res.status(201).json({ message: "Post created", post: newPost });
-    } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        await post.populate('author', 'name email'); // include author info
+        res.status(201).json({ message: 'Post created successfully', post });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
 // Get all posts
-exports.getPosts = async (req, res) => {
+exports.getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find()
-            .populate("user", "name email")
-            .populate("comments.user", "name email")
-            .sort({ createdAt: -1 });
-        res.status(200).json(posts);
-    } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+            .populate('author', 'name email') // populate author info
+            .sort({ createdAt: -1 }); // latest posts first
+
+        res.status(200).json(posts); // return array of posts
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
     }
 };
